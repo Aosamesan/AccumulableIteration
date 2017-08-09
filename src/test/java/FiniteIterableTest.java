@@ -1,6 +1,7 @@
+import accumulate.RangeAccumulator;
 import org.junit.Test;
+import procedure.ProcedureUtils;
 import range.AccumulableRange;
-import range.Range;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,13 +9,36 @@ import java.util.List;
 public class FiniteIterableTest {
 
     @Test
-    public void shouldIterable4() {
-        List<String> numberList = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
-        Range<String, String> range = AccumulableRange.createRange(numberList, (e) -> e);
-        for (int i = 0; i < 2; i++) {
-            range = AccumulableRange.createRange(numberList, range.execute(), (p, e) -> e + p);
-        }
-        Iterable<String> result = range.execute();
+    public void shouldAccumulate() {
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+        List<String> charList = Arrays.asList("a", "b", "c");
+
+        Iterable<String> result =
+                new RangeAccumulator<String, String>()
+                .append(
+                    AccumulableRange.createRange(
+                            Integer.class,
+                            String.class,
+                            list,
+                            ProcedureUtils.toStringProcedure()
+                    )
+                ).append(
+                    AccumulableRange.createRange(
+                            String.class,
+                            String.class,
+                            String.class,
+                            charList,
+                            ProcedureUtils.concatAsPostfixWithMid(":")
+                    )
+                ).append(
+                    AccumulableRange.createRange(
+                            String.class,
+                            String.class,
+                            String.class,
+                            charList,
+                            ProcedureUtils.concatAsPrefixWithMid(":")
+                    )
+                ).execute();
 
         for (String s : result) {
             System.out.println(s);
